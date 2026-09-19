@@ -1,0 +1,16 @@
+# Chandrayaan-2 OHRC Preprocessing Pipeline
+# Python 3.11+
+# Install with: pip install -r requirements.txt
+
+pds4-tools>=1.4
+numpy>=1.24
+matplotlib>=3.7
+Pillow>=10.0
+opencv-python>=4.8
+tqdm>=4.65
+pandas>=2.0
+scipy>=1.11
+# Domain adaptation pipeline
+ultralytics>=8.0
+requests>=2.31
+pyyaml>=6.0

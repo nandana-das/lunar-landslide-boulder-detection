@@ -1,0 +1,13 @@
+product_id,date,total_tiles,usable_tiles,discarded_tiles,pct_discarded,image_lines,image_samples,n_tile_cols,n_tile_rows,tile_size,overlap,edge_handling,dark_threshold,threshold_domain,image_pix_min,image_pix_max,image_pix_mean
+ch2_ohr_ncp_20190906T2241285714_d_img_gds,20190906,3002,2797,205,6.83,?,?,?,?,640,0,zero_pad,20,native_uint8,?,?,?
+ch2_ohr_ncp_20190907T0438126359_d_img_g26,20190907,2793,2654,139,4.98,?,?,?,?,640,0,zero_pad,20,native_uint8,?,?,?
+ch2_ohr_ncp_20240425T1012478407_d_img_d18,20240425,2736,2709,27,0.99,?,?,?,?,640,0,zero_pad,20,native_uint8,?,?,?
+ch2_ohr_ncp_20240425T1209509264_d_img_d18,20240425,2793,2749,44,1.58,93693,12000,19,147,640,0,zero_pad,20,native_uint8,0.0,255.0,68.521
+ch2_ohr_ncp_20240425T1406019344_d_img_d18,20240425,2793,2759,34,1.22,93693,12000,19,147,640,0,zero_pad,20,native_uint8,0.0,255.0,79.38
+ch2_ohr_ncp_20240425T1603031918_d_img_d18,20240425,2679,2640,39,1.46,90148,12000,19,141,640,0,zero_pad,20,native_uint8,0.0,255.0,74.373
+ch2_ohr_ncp_20250516T0948068899_d_img_d18,20250516,2679,2677,2,0.07,?,?,?,?,640,0,zero_pad,20,native_uint8,?,?,?
+ch2_ohr_ncp_20250516T1145499313_d_img_d18,20250516,2679,2676,3,0.11,90148,12000,19,141,640,0,zero_pad,20,native_uint8,0.0,255.0,88.112
+ch2_ohr_ncp_20250516T1342347288_d_img_d18,20250516,2679,2679,0,0.0,90148,12000,19,141,640,0,zero_pad,20,native_uint8,0.0,255.0,74.986
+ch2_ohr_ncp_20250516T1540191774_d_img_d18,20250516,2679,2679,0,0.0,90134,12000,19,141,640,0,zero_pad,20,native_uint8,0.0,255.0,96.006
+ch2_ohr_ncp_20250612T2031048828_d_img_d18,20250612,2375,2375,0,0.0,?,?,?,?,640,0,zero_pad,20,native_uint8,?,?,?
+ch2_ohr_ncp_20250612T2229094979_d_img_d18,20250612,2375,2375,0,0.0,79780,12000,19,125,640,0,zero_pad,20,native_uint8,0.0,255.0,156.808

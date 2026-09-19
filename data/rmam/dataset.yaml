@@ -1,0 +1,5 @@
+path: D:/Nandana/MTECH/Semester 3/Projects/TP/lunar-landslide-boulder-detection/data/rmam/moon
+train: train/images
+val: val/images
+nc: 1
+names: [rockfall]
