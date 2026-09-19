@@ -88,8 +88,16 @@ runs/
 weights/
 *.pt
 data/tiles/
+runs/
+weights/
+*.pt
+data/tiles/
 data/raw/
 data/calibrated/
 pradan.issdc.gov.in/
 C:/ohrc_detections/
 .venv/
+
+data/annotation_sample/
+data/priority_sample/
+data/rmam/
