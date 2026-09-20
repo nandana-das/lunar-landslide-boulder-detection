@@ -107,3 +107,6 @@ data/combined_hm/train/
 data/combined_hm/val/
 data/prieur/boulder2024/
 data/prieur/moon_only/
+
+data/combined_hm/
+data/prieur/
