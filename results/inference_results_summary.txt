@@ -1,0 +1,29 @@
+﻿# OHRC Rockfall Detection — Inference Results Summary
+# Generated: September 2026
+
+## Stage 2 Model Results (RMaM+Prieur, Multi-HM, tau=0.20)
+YOLO26n: detections=4565, tiles=1193
+YOLOv5s: detections=5026, tiles=1532
+YOLOv8n: detections=41941, tiles=6621  # over-detection at tau=0.20
+YOLOv8n (tau=0.35): detections=11988, tiles=2789
+YOLOv8n (tau=0.50): detections=3118, tiles=1257
+
+## Early Pipeline Baseline (RMaM only, single-HM, tau=0.20)
+YOLOv8n (no HM): detections=54, tiles=52
+YOLOv8n (single-HM): detections=989, tiles=914
+YOLOv5s (single-HM): detections=1628, tiles=1310
+
+## Source Domain Validation (Prieur lunar HM val set, 697 images)
+### Stage 1 (RMaM+Prieur, frozen backbone)
+YOLO26n: mAP50=0.549, P=0.623, R=0.511
+YOLOv8n: mAP50=0.520, P=0.604, R=0.483
+YOLOv5s: mAP50=0.600, P=0.656, R=0.548
+
+### Stage 2 (combined HM, all layers)
+YOLO26n: mAP50=0.640, P=0.660, R=0.590
+YOLOv8n: mAP50=0.596, P=0.620, R=0.568
+YOLOv5s: mAP50=0.649, P=0.653, R=0.607
+
+## Confidence Statistics (early pipeline, tau=0.20)
+YOLOv8n+HM: N=989, mean=0.273, median=0.254, <0.30=728, >=0.30=261
+YOLOv5s+HM: N=1628, mean=0.241, median=0.233, <0.30=1509, >=0.30=119
