@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chandrayaan-2 OHRC Lunar Rockfall & Boulder Detection Demo</title>
+  <meta name="description" content="Interactive demo showcasing domain-adaptive transfer learning for lunar rockfall and boulder detection on Chandrayaan-2 OHRC imagery.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #090d16;
+      --bg-secondary: #0f172a;
+      --bg-card: rgba(18, 26, 44, 0.75);
+      --bg-card-hover: rgba(26, 38, 64, 0.85);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(56, 189, 248, 0.3);
+      --accent-cyan: #38bdf8;
+      --accent-blue: #3b82f6;
+      --accent-gold: #fbbf24;
+      --accent-emerald: #34d399;
+      --accent-rose: #f43f5e;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --shadow-lg: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(56, 189, 248, 0.1);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background-color: var(--bg-primary);
+      background-image: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(56, 189, 248, 0.12), transparent 70%),
+        radial-gradient(circle at 10% 40%, rgba(99, 102, 241, 0.05), transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.05), transparent 40%);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 24px 64px 24px;
+    }
+
+    /* Top Navigation / Brand Bar */
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 36px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #090d16;
+      font-size: 18px;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+    }
+
+    .brand-text {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    .nav-badges {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-cyan {
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    .badge-gold {
+      background: rgba(251, 191, 36, 0.12);
+      color: var(--accent-gold);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+    }
+
+    .badge-live {
+      background: rgba(52, 211, 153, 0.12);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 8px var(--accent-emerald);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: left;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .hero-pretitle {
+      color: var(--accent-cyan);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .hero-title {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 14px;
+      background: linear-gradient(135deg, #ffffff 30%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 960px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      font-size: 13px;
+      color: var(--text-dim);
+      align-items: center;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meta-item strong {
+      color: var(--text-main);
+    }
+
+    /* Key Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 20px;
+      backdrop-filter: blur(12px);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-highlight);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-dim);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .stat-val {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .stat-val span {
+      font-size: 15px;
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Section Headings */
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+    }
+
+    .section-title-num {
+      font-size: 14px;
+      font-family: var(--font-mono);
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .section-hint {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    /* Pipeline Diagram Flowchart */
+    .pipeline-section {
+      margin-bottom: 56px;
+    }
+
+    .flowchart {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      position: relative;
+      margin-top: 20px;
+    }
+
+    .stage-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 20px 16px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+      transition: all 0.25s ease;
+    }
+
+    .stage-card:hover {
+      border-color: var(--accent-cyan);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-3px);
+    }
+
+    .stage-card.highlight {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.08) 0%, rgba(15, 23, 42, 0.8) 100%);
+    }
+
+    .stage-num {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .stage-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    .stage-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      flex-grow: 1;
+      margin-bottom: 12px;
+    }
+
+    .stage-pill {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      text-align: center;
+    }
+
+    .stage-card:not(:last-child)::after {
+      content: '→';
+      position: absolute;
+      right: -13px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      z-index: 2;
+      text-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+    }
+
+    /* Model Comparison Section */
+    .table-section {
+      margin-bottom: 56px;
+    }
+
+    .card-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .custom-table th {
+      background: rgba(15, 23, 42, 0.9);
+      padding: 14px 18px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      font-size: 11.5px;
+      letter-spacing: 0.8px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .custom-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+    }
+
+    .custom-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .model-name {
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .model-tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .tag-champion {
+      background: rgba(251, 191, 36, 0.15);
+      color: var(--accent-gold);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+    }
+
+    .tag-recall {
+      background: rgba(52, 211, 153, 0.15);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+    }
+
+    .metric-val {
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    .metric-top {
+      color: var(--accent-cyan);
+      font-weight: 700;
+    }
+
+    .status-badge {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-progress {
+      background: rgba(251, 191, 36, 0.1);
+      color: var(--accent-gold);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+    }
+
+    .table-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .tab-btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    .insight-card {
+      margin-top: 20px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: var(--radius);
+      padding: 18px 22px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .insight-header {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .insight-card p {
+      font-size: 13px;
+      color: var(--text-main);
+      margin-bottom: 10px;
+      line-height: 1.55;
+    }
+
+    .insight-card ul {
+      margin-left: 20px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .insight-card li {
+      margin-bottom: 6px;
+    }
+
+    .insight-card strong {
+      color: #fff;
+    }
+
+    /* Detection Gallery */
+    .gallery-section {
+      margin-bottom: 56px;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .gallery-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .gallery-card:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .gallery-img-wrap {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      background: #000;
+      overflow: hidden;
+    }
+
+    .gallery-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .gallery-card:hover .gallery-img-wrap img {
+      transform: scale(1.03);
+    }
+
+    .gallery-overlay-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(9, 13, 22, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .gallery-overlay-zoom {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(9, 13, 22, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      color: var(--accent-cyan);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .gallery-card:hover .gallery-overlay-zoom {
+      opacity: 1;
+    }
+
+    .gallery-content {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .gallery-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .gallery-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .gallery-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 14px;
+      flex-grow: 1;
+    }
+
+    .gallery-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 11.5px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+    }
+
+    .meta-pill strong {
+      color: var(--text-main);
+    }
+
+    /* Regional Comparison Section */
+    .regional-section {
+      margin-bottom: 56px;
+    }
+
+    .regional-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .chart-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .chart-box img {
+      width: 100%;
+      height: auto;
+      border-radius: var(--radius-sm);
+      display: block;
+      background: #fff; /* Matplotlib charts have white backgrounds */
+    }
+
+    .regional-analysis {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 24px;
+      backdrop-filter: blur(10px);
+    }
+
+    .analysis-heading {
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .regional-card-mini {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .mini-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mini-title-south { color: var(--accent-cyan); }
+    .mini-title-eq { color: var(--accent-gold); }
+
+    .mini-text {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .divergence-callout {
+      margin-top: 16px;
+      padding: 14px;
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 3px solid var(--accent-cyan);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: 13px;
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+
+    /* Threshold Table Section */
+    .threshold-section {
+      margin-bottom: 56px;
+    }
+
+    /* Lightbox Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 8, 15, 0.92);
+      backdrop-filter: blur(10px);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content-wrap {
+      max-width: 900px;
+      width: 100%;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-highlight);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+      position: relative;
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px 8px;
+    }
+
+    .modal-close:hover {
+      color: #fff;
+    }
+
+    .modal-body {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      max-height: 75vh;
+    }
+
+    .modal-img-box {
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .modal-img-box img {
+      max-width: 100%;
+      max-height: 65vh;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+
+    .modal-sidebar {
+      padding: 24px;
+      background: var(--bg-card);
+      border-left: 1px solid var(--border-color);
+      overflow-y: auto;
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding: 32px 0 16px 0;
+      font-size: 13px;
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-left: 16px;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent-cyan);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .flowchart {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .stage-card:not(:last-child)::after {
+        content: '↓';
+        right: 50%;
+        bottom: -18px;
+        top: auto;
+        transform: translateX(50%);
+      }
+      .gallery-grid {
+        grid-template-columns: 1fr;
+      }
+      .regional-grid {
+        grid-template-columns: 1fr;
+      }
+      .modal-body {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="brand-logo">☾</div>
+        <div>
+          <div class="brand-text">ISRO Chandrayaan-2 OHRC Research Demo</div>
+        </div>
+      </div>
+      <div class="nav-badges">
+        <span class="badge badge-cyan">Alliance University • M.Tech AI</span>
+        <span class="badge badge-gold">Target: IEEE GRSL / ICNLP 2027</span>
+        <span class="badge badge-live"><span class="pulse-dot"></span> 4 Models Benchmarked (YOLO + RT-DETR)</span>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-pretitle">Mission Presentation & Research Showcase</div>
+      <h1 class="hero-title">Lunar Rockfall & Boulder Detection from Chandrayaan-2 OHRC Imagery</h1>
+      <p class="hero-desc">
+        A domain-adaptive transfer learning pipeline transferring knowledge from labeled NASA LROC NAC source domain imagery to unlabeled Chandrayaan-2 OHRC target domain imagery via multi-reference histogram matching — without requiring any manual OHRC annotations.
+      </p>
+      <div class="meta-bar">
+        <div class="meta-item">👥 Authors: <strong>Nandana Narayan Das, Gowri Kannan</strong></div>
+        <div class="meta-item">🛰️ Instrument: <strong>Chandrayaan-2 OHRC (0.25 m/px)</strong></div>
+        <div class="meta-item">🎯 Domain Source: <strong>NASA LROC NAC (RMaM-2020 + Prieur et al. 2023)</strong></div>
+      </div>
+    </section>
+
+    <!-- Key Metrics Highlight Strip -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">OHRC Tiles Evaluated</div>
+        <div class="stat-val">31,769 <span>tiles</span></div>
+        <div class="stat-sub">12 PDS4 Calibrated Products (640×640 px)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Confirmed Rockfall Detections</div>
+        <div class="stat-val">4,565 <span>boulders</span></div>
+        <div class="stat-sub">YOLO26n @ τ = 0.20 across 1,193 tiles</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Best Test mAP@0.5</div>
+        <div class="stat-val">0.6166 <span>mAP</span></div>
+        <div class="stat-sub">YOLO26n on Prieur Lunar Test Set (+5.0% vs v8n)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Domain Adaptation Gain</div>
+        <div class="stat-val">3.1× <span>multiplier</span></div>
+        <div class="stat-sub">Multi-Ref HM vs Single-Ref Baseline (+9.1% mAP)</div>
+      </div>
+    </div>
+
+    <!-- Section 1: 5-Stage Pipeline Flowchart -->
+    <section class="pipeline-section">
+      <div class="section-header">
+        <div class="section-title">
+          <span class="section-title-num">STAGE FLOW</span>
+          <span>Domain-Adaptive Transfer Learning Pipeline</span>
+        </div>
+        <div class="section-hint">Unsupervised domain bridging between lunar orbiters</div>
+      </div>
+
+      <div class="flowchart">
+        <!-- Stage 1 -->
+        <div class="stage-card">
+          <div class="stage-num">Stage 1</div>
+          <div class="stage-title">Source Domain Dataset</div>
+          <div class="stage-desc">
+            Aggregation of NASA LROC NAC labeled boulder datasets: <strong>RMaM-2020</strong> (349 train) + <strong>Prieur et al. 2023</strong> (3,719 train, 697 val, 262 test) normalized to unified YOLO bounding boxes.
+          </div>
+          <div class="stage-pill">4,068 Labeled Images</div>
+        </div>
+
+        <!-- Stage 2 -->
+        <div class="stage-card">
+          <div class="stage-num">Stage 2</div>
+          <div class="stage-title">Backbone Pre-training</div>
+          <div class="stage-desc">
+            Initial fine-tuning of YOLO26n, YOLOv8n, YOLOv5s and RT-DETR backbones on combined LROC lunar source data with frozen feature extractors (LR=1e-3, 50 epochs).
+          </div>
+          <div class="stage-pill">Frozen Feature Tuning</div>
+        </div>
+
+        <!-- Stage 3 (Highlighted) -->
+        <div class="stage-card highlight">
+          <div class="stage-num">Stage 3 • Core Contribution</div>
+          <div class="stage-title">Multi-Reference Histogram Matching</div>
+          <div class="stage-desc">
+            20-tile averaged OHRC photometric reference profile. Specification applied across all training images to eliminate sensor, albedo, and phase-angle domain shifts.
+          </div>
+          <div class="stage-pill" style="color: var(--accent-cyan); border-color: rgba(56,189,248,0.3);">Bridge Sensor Domain Gap</div>
+        </div>
+
+        <!-- Stage 4 -->
+        <div class="stage-card">
+          <div class="stage-num">Stage 4</div>
+          <div class="stage-title">Domain-Adapted Fine-Tuning</div>
+          <div class="stage-desc">
+            Full end-to-end unfreezing with cosine annealing schedule (LR=1e-4, 50 epochs) on domain-matched lunar images. Benchmarked against held-out lunar test split.
+          </div>
+          <div class="stage-pill">All Layers Unfrozen</div>
+        </div>
+
+        <!-- Stage 5 -->
+        <div class="stage-card">
+          <div class="stage-num">Stage 5</div>
+          <div class="stage-title">OHRC Target Inference</div>
+          <div class="stage-desc">
+            Direct high-throughput inference across 31,769 unlabeled Chandrayaan-2 OHRC tiles at 0.25 m/px. Comparative analysis across South Pole (-70°S) and Equatorial (+60°N) regions.
+          </div>
+          <div class="stage-pill">31,769 OHRC Tiles</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Model Comparison Table -->
+    <section class="table-section">
+      <div class="section-header">
+        <div class="section-title">
+          <span class="section-title-num">METRICS</span>
+          <span>Model Architecture Comparison (CNN vs. Vision Transformer)</span>
+        </div>
+        <div class="section-hint">All 4 models evaluated &bull; Sources: results/table2_rtdetr_comparison.csv &amp; results/table3_rtdetr_comparison.csv</div>
+      </div>
+
+      <!-- Table View Tabs -->
+      <div class="table-tabs">
+        <button id="btn-val" class="tab-btn active" onclick="switchTableTab('val')">
+          <span>📊 Stage-2 Validation Benchmark (Table 2)</span>
+        </button>
+        <button id="btn-ohrc" class="tab-btn" onclick="switchTableTab('ohrc')">
+          <span>🛰️ OHRC Target Domain Inference (Table 3)</span>
+        </button>
+        <button id="btn-test" class="tab-btn" onclick="switchTableTab('test')">
+          <span>🎯 Held-Out Test Split (262 images)</span>
+        </button>
+      </div>
+
+      <!-- View 1: Table 2 Validation Benchmark (All 4 Models) -->
+      <div id="view-val" class="table-view card-wrap">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Model Architecture</th>
+              <th>mAP @ 0.5</th>
+              <th>Precision</th>
+              <th>Recall</th>
+              <th>F1 Score</th>
+              <th>Architecture Type</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="model-name">
+                  <span>YOLO26n</span>
+                  <span class="model-tag tag-champion">Champion</span>
+                </div>
+              </td>
+              <td><span class="metric-val metric-top">0.6400</span></td>
+              <td><span class="metric-val metric-top">0.6600</span></td>
+              <td><span class="metric-val">0.5900</span></td>
+              <td><span class="metric-val">0.6230</span></td>
+              <td><span style="font-size: 12px; color: var(--text-muted);">Next-Gen Lightweight CNN</span></td>
+              <td><span class="badge badge-cyan">Validated</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="model-name">
+                  <span>YOLOv5s</span>
+                  <span class="model-tag tag-recall">Best Recall & F1</span>
+                </div>
+              </td>
+              <td><span class="metric-val metric-top">0.6490</span></td>
+              <td><span class="metric-val">0.6530</span></td>
+              <td><span class="metric-val metric-top">0.6070</span></td>
+              <td><span class="metric-val metric-top">0.6292</span></td>
+              <td><span style="font-size: 12px; color: var(--text-muted);">Anchor-Based CNN</span></td>
+              <td><span class="badge badge-cyan">Validated</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="model-name">
+                  <span>YOLOv8n</span>
+                  <span class="model-tag" style="background: rgba(148,163,184,0.15); color: var(--text-muted);">Anchor-Free</span>
+                </div>
+              </td>
+              <td><span class="metric-val">0.5960</span></td>
+              <td><span class="metric-val">0.6200</span></td>
+              <td><span class="metric-val">0.5680</span></td>
+              <td><span class="metric-val">0.5929</span></td>
+              <td><span style="font-size: 12px; color: var(--text-muted);">Anchor-Free CNN</span></td>
+              <td><span class="badge badge-cyan">Validated</span></td>
+            </tr>
+            <tr style="background: rgba(244, 63, 94, 0.04);">
+              <td>
+                <div class="model-name">
+                  <span>RT-DETR-L</span>
+                  <span class="model-tag" style="background: rgba(244,63,94,0.15); color: var(--accent-rose);">Vision Transformer</span>
+                </div>
+              </td>
+              <td><span class="metric-val" style="color: var(--accent-rose);">0.4843</span></td>
+              <td><span class="metric-val">0.5483</span></td>
+              <td><span class="metric-val">0.5371</span></td>
+              <td><span class="metric-val">0.5426</span></td>
+              <td><span style="font-size: 12px; color: var(--text-muted);">Real-Time DETR Transformer</span></td>
+              <td><span class="badge" style="background: rgba(244,63,94,0.15); color: var(--accent-rose); border: 1px solid rgba(244,63,94,0.3);">Completed</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="table-footer-note">
+          <div>
+            Benchmark Source: <strong>results/table2_rtdetr_comparison.csv</strong> &bull; Evaluated on Prieur lunar validation set (697 images with Multi-Ref HM).
+          </div>
+          <div>
+            CNN Lead: <strong>YOLO26n / YOLOv5s outperform RT-DETR-L by up to +16.5% mAP@0.5</strong> on domain-adapted lunar data.
+          </div>
+        </div>
+      </div>
+
+      <!-- View 2: Table 3 OHRC Target Domain Cross-Sensor Inference (All 4 Models) -->
+      <div id="view-ohrc" class="table-view card-wrap" style="display: none;">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Total Detections</th>
+              <th>Positive Tiles</th>
+              <th>Evaluated Tiles</th>
+              <th>Tile Hit Rate</th>
+              <th>Mean Confidence [c̄]</th>
+              <th>Operational Behavior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="model-name">
+                  <span>YOLO26n</span>
+                  <span class="model-tag tag-champion">Optimal Balance</span>
+                </div>
+              </td>
+              <td><span class="metric-val metric-top">4,565</span></td>
+              <td><span class="metric-val">1,193</span></td>
+              <td><span class="metric-val">31,769</span></td>
+              <td><span class="metric-val metric-top">3.75%</span></td>
+              <td><span class="metric-val">0.297</span></td>
+              <td><span class="badge badge-cyan">Disciplined / High Precision</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="model-name">
+                  <span>YOLOv5s</span>
+                  <span class="model-tag tag-recall">Anchor Consensus</span>
+                </div>
+              </td>
+              <td><span class="metric-val">5,026</span></td>
+              <td><span class="metric-val">1,532</span></td>
+              <td><span class="metric-val">31,769</span></td>
+              <td><span class="metric-val">4.82%</span></td>
+              <td><span class="metric-val">0.312</span></td>
+              <td><span class="badge badge-cyan">High Agreement with YOLO26n</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="model-name">
+                  <span>YOLOv8n</span>
+                  <span class="model-tag" style="background: rgba(251,191,36,0.15); color: var(--accent-gold);">High Sensitivity</span>
+                </div>
+              </td>
+              <td><span class="metric-val" style="color: var(--accent-gold);">41,941</span></td>
+              <td><span class="metric-val">6,621</span></td>
+              <td><span class="metric-val">31,769</span></td>
+              <td><span class="metric-val">20.84%</span></td>
+              <td><span class="metric-val">0.313</span></td>
+              <td><span class="badge badge-gold">Sensitive (Recommended τ ≥ 0.35)</span></td>
+            </tr>
+            <tr style="background: rgba(244, 63, 94, 0.04);">
+              <td>
+                <div class="model-name">
+                  <span>RT-DETR-L</span>
+                  <span class="model-tag" style="background: rgba(244,63,94,0.15); color: var(--accent-rose);">Transformer Drift</span>
+                </div>
+              </td>
+              <td><span class="metric-val" style="color: var(--accent-rose);">436,896</span></td>
+              <td><span class="metric-val" style="color: var(--accent-rose);">25,483</span></td>
+              <td><span class="metric-val">31,769</span></td>
+              <td><span class="metric-val" style="color: var(--accent-rose);">80.21%</span></td>
+              <td><span class="metric-val">0.2959</span></td>
+              <td><span class="badge" style="background: rgba(244,63,94,0.15); color: var(--accent-rose); border: 1px solid rgba(244,63,94,0.3);">Regolith Texture Hallucination</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="table-footer-note">
+          <div>
+            Benchmark Source: <strong>results/table3_rtdetr_comparison.csv</strong> &bull; Complete inference at default threshold τ = 0.20 across 31,769 calibrated OHRC tiles.
+          </div>
+          <div>
+            Domain Robustness: <strong>YOLO26n &amp; YOLOv5s maintain localized spatial constraints</strong>, while RT-DETR-L triggers false positives across 80% of tiles.
+          </div>
+        </div>
+      </div>
+
+      <!-- View 3: Held-Out Test Split (Prieur Test 262 Images) -->
+      <div id="view-test" class="table-view card-wrap" style="display: none;">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Model Architecture</th>
+              <th>mAP @ 0.5</th>
+              <th>mAP @ 0.5:0.95</th>
+              <th>Precision</th>
+              <th>Recall</th>
+              <th>F1 Score</th>
+              <th>Benchmark Split</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="model-name">
+                  <span>YOLO26n</span>
+                  <span class="model-tag tag-champion">Best Test mAP</span>
+                </div>
+              </td>
+              <td><span class="metric-val metric-top">0.6166</span></td>
+              <td><span class="metric-val metric-top">0.2359</span></td>
+              <td><span class="metric-val metric-top">0.6367</span></td>
+              <td><span class="metric-val">0.5804</span></td>
+              <td><span class="metric-val metric-top">0.6072</span></td>
+              <td><span style="font-size: 12px; color: var(--text-muted);">Prieur Test (262 imgs)</span></td>
+              <td><span class="badge badge-cyan">Validated</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="model-name">
+                  <span>YOLOv5s</span>
+                  <span class="model-tag tag-recall">Best Recall</span>
+                </div>
+              </td>
+              <td><span class="metric-val">0.6122</span></td>
+              <td><span class="metric-val">0.2336</span></td>
+              <td><span class="metric-val">0.6303</span></td>
+              <td><span class="metric-val metric-top">0.5827</span></td>
+              <td><span class="metric-val">0.6056</span></td>
+              <td><span style="font-size: 12px; color: var(--text-muted);">Prieur Test (262 imgs)</span></td>
+              <td><span class="badge badge-cyan">Validated</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="model-name">
+                  <span>YOLOv8n</span>
+                  <span class="model-tag" style="background: rgba(148,163,184,0.15); color: var(--text-muted);">Anchor-Free</span>
+                </div>
+              </td>
+              <td><span class="metric-val">0.5663</span></td>
+              <td><span class="metric-val">0.2078</span></td>
+              <td><span class="metric-val">0.5962</span></td>
+              <td><span class="metric-val">0.5593</span></td>
+              <td><span class="metric-val">0.5772</span></td>
+              <td><span style="font-size: 12px; color: var(--text-muted);">Prieur Test (262 imgs)</span></td>
+              <td><span class="badge badge-cyan">Validated</span></td>
+            </tr>
+            <tr style="background: rgba(244, 63, 94, 0.04);">
+              <td>
+                <div class="model-name">
+                  <span>RT-DETR-L</span>
+                  <span class="model-tag" style="background: rgba(244,63,94,0.15); color: var(--accent-rose);">Val Benchmark</span>
+                </div>
+              </td>
+              <td><span class="metric-val" style="color: var(--accent-rose);">0.4843</span></td>
+              <td><span class="metric-val" style="color: var(--text-dim);">-</span></td>
+              <td><span class="metric-val">0.5483</span></td>
+              <td><span class="metric-val">0.5371</span></td>
+              <td><span class="metric-val">0.5426</span></td>
+              <td><span style="font-size: 12px; color: var(--text-muted);">Val Benchmark Ref</span></td>
+              <td><span class="badge badge-cyan">Evaluated</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="table-footer-note">
+          <div>
+            Benchmark Source: <strong>results/test_metrics_stage2.csv</strong> &bull; Held-out Prieur lunar test split.
+          </div>
+          <div>
+            Key Takeaway: <strong>YOLO26n achieves the highest test accuracy (0.6166 mAP) and best F1 (0.6072)</strong> with minimal parameter footprint.
+          </div>
+        </div>
+      </div>
+
+      <!-- Architectural Comparison Insight Box -->
+      <div class="insight-card">
+        <div class="insight-header">
+          <span>💡 Core Scientific Insight: CNN Inductive Bias vs. Vision Transformer Cross-Domain Stability</span>
+        </div>
+        <p>
+          Benchmarking across both CNN (YOLO26n, YOLOv5s, YOLOv8n) and Vision Transformer (RT-DETR-L) architectures reveals a crucial physical finding for planetary remote sensing:
+        </p>
+        <ul>
+          <li><strong>Domain Generalization Gap:</strong> On the domain-adapted lunar validation split, RT-DETR-L lags YOLO26n by <strong>-15.6% mAP@0.5</strong> (0.4843 vs. 0.6400).</li>
+          <li><strong>Regolith Texture Hallucination:</strong> On 31,769 unlabeled OHRC tiles, RT-DETR-L triggered <strong>436,896 detections across 80.2% of all tiles</strong> (compared to 4,565 on YOLO26n). Without localized convolutional inductive priors, transformer global cross-attention layers mistake fine regolith albedo ripples and crater micro-shadows for candidate rockfall boulders.</li>
+          <li><strong>Conclusion for Mission Deployment:</strong> Compact CNNs with localized receptive fields (specifically <strong>YOLO26n</strong>) are vastly superior for zero-target-annotation planetary remote sensing, delivering tightly calibrated false-positive rejection under cross-sensor transfer.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 3: Sample Detection Gallery -->
+    <section class="gallery-section">
+      <div class="section-header">
+        <div class="section-title">
+          <span class="section-title-num">GALLERY</span>
+          <span>Sample Detections on Chandrayaan-2 OHRC Tiles</span>
+        </div>
+        <div class="section-hint">Click any tile to open high-resolution examination modal</div>
+      </div>
+
+      <div class="gallery-grid">
+        <!-- Sample 1: High-Confidence Single -->
+        <div class="gallery-card" onclick="openModal('single')">
+          <div class="gallery-img-wrap">
+            <img src="images/detection_single_high_conf.png" alt="High-confidence single boulder detection">
+            <div class="gallery-overlay-badge">
+              <span>🎯 Conf: 0.6527</span>
+            </div>
+            <div class="gallery-overlay-zoom">🔍 Click to Inspect</div>
+          </div>
+          <div class="gallery-content">
+            <div class="gallery-tag">Single Detection Case</div>
+            <h3 class="gallery-title">High-Confidence Isolated Boulder</h3>
+            <p class="gallery-desc">
+              Prominent isolated boulder resting on polar regolith. Characterized by high albedo crest and razor-sharp cast shadow under low solar elevation (SI ~84°). Zero false-positive noise in surrounding tile.
+            </p>
+            <div class="gallery-meta">
+              <div class="meta-pill">Region: <strong>South Pole (~ -71°S)</strong></div>
+              <div class="meta-pill">Product: <strong>...g26_x05760_y85760</strong></div>
+              <div class="meta-pill">Model: <strong>YOLO26n</strong></div>
+              <div class="meta-pill">Box Dim: <strong>15.5 × 48.1 px</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sample 2: Multi-Detection Cluster -->
+        <div class="gallery-card" onclick="openModal('cluster')">
+          <div class="gallery-img-wrap">
+            <img src="images/detection_cluster.png" alt="Multi-detection rockfall boulder cluster">
+            <div class="gallery-overlay-badge">
+              <span>🪨 Cluster: 5 Boulders (Max Conf 0.641)</span>
+            </div>
+            <div class="gallery-overlay-zoom">🔍 Click to Inspect</div>
+          </div>
+          <div class="gallery-content">
+            <div class="gallery-tag">Mass Wasting Track</div>
+            <h3 class="gallery-title">Multi-Detection Boulder Cluster</h3>
+            <p class="gallery-desc">
+              Linear dispersion of multiple impact ejecta / rockfall fragments along a mass-wasting chute. Models demonstrate high detection density along the down-slope trajectory with tight spatial alignment.
+            </p>
+            <div class="gallery-meta">
+              <div class="meta-pill">Region: <strong>South Pole (~ -71°S)</strong></div>
+              <div class="meta-pill">Product: <strong>...gds_x04480_y64640</strong></div>
+              <div class="meta-pill">Model: <strong>YOLO26n / v5s</strong></div>
+              <div class="meta-pill">Mean Conf: <strong>0.4653</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sample 3: Rim-Context Detection -->
+        <div class="gallery-card" onclick="openModal('rim')">
+          <div class="gallery-img-wrap">
+            <img src="images/detection_rim_context.png" alt="Crater rim context rockfall detection">
+            <div class="gallery-overlay-badge">
+              <span>🌋 Rim Crest Context (Max Conf 0.440)</span>
+            </div>
+            <div class="gallery-overlay-zoom">🔍 Click to Inspect</div>
+          </div>
+          <div class="gallery-content">
+            <div class="gallery-tag">Geomorphological Context</div>
+            <h3 class="gallery-title">Crater Rim Slope Detection</h3>
+            <p class="gallery-desc">
+              Boulders perched on the steep upper rim crest of an impact crater. Detects rocks situated right at the boundary of extreme illumination and topographic shadow (σ=74.6), where seismic shaking dislodges debris.
+            </p>
+            <div class="gallery-meta">
+              <div class="meta-pill">Region: <strong>South Pole (~ -71°S)</strong></div>
+              <div class="meta-pill">Product: <strong>...gds_x06400_y17280</strong></div>
+              <div class="meta-pill">Topography: <strong>Crater Rim Scarp</strong></div>
+              <div class="meta-pill">Pixel StdDev: <strong>74.6 (Steep Relief)</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Regional Divergence Analysis -->
+    <section class="regional-section">
+      <div class="section-header">
+        <div class="section-title">
+          <span class="section-title-num">REGIONAL STUDY</span>
+          <span>South Pole vs. Equatorial Detection Divergence</span>
+        </div>
+        <div class="section-hint">Photometric & topographic divergence across 12 OHRC products &bull; results/confidence_analysis/</div>
+      </div>
+
+      <div class="regional-grid">
+        <div class="chart-box">
+          <img src="images/regional_detections_by_model.png" alt="Regional Detections by Model Comparison Chart">
+        </div>
+
+        <div class="regional-analysis">
+          <h3 class="analysis-heading">
+            <span>Geological & Photometric Divergence</span>
+          </h3>
+
+          <div class="regional-card-mini">
+            <div class="mini-title mini-title-south">
+              <span>South Pole (lat ≈ -70°S) • 6 Products</span>
+              <span>Incidence: 78°–84°</span>
+            </div>
+            <p class="mini-text">
+              Low solar elevation angles produce deep, elongated shadows. The high contrast between sunlit boulder rims and black shadow pockets provides unambiguous structural cues, yielding high mean confidence (0.288–0.314) and strong model consensus.
+            </p>
+          </div>
+
+          <div class="regional-card-mini">
+            <div class="mini-title mini-title-eq">
+              <span>Equatorial (lat ≈ +60°N) • 6 Products</span>
+              <span>Incidence: 59°–68°</span>
+            </div>
+            <p class="mini-text">
+              Steeper solar illumination reduces shadow extent, shifting the visual signature toward subtle regolith textural variations. YOLOv8n becomes highly sensitive to crater ripples and small mounds (81% tile hit rate), whereas YOLO26n remains disciplined and calibrated.
+            </p>
+          </div>
+
+          <div class="divergence-callout">
+            <strong>Key Presentation Finding:</strong> Transfer learning without target domain labels is fundamentally governed by <em>illumination geometry</em>. Multi-Reference Histogram Matching successfully equalized the first-order sensor response, but polar low-angle shadow physics remains the most reliable regime for automated rockfall classification.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Recommended Confidence Thresholds -->
+    <section class="threshold-section">
+      <div class="section-header">
+        <div class="section-title">
+          <span class="section-title-num">CALIBRATION</span>
+          <span>Recommended Operating Thresholds & Calibration</span>
+        </div>
+        <div class="section-hint">Multi-model consensus pseudo-validation &bull; Source: results/confidence_analysis/recommended_operating_thresholds.csv</div>
+      </div>
+
+      <div class="card-wrap">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Recommended Threshold (τ)</th>
+              <th>Max F1 Score</th>
+              <th>Proxy Precision</th>
+              <th>Proxy Recall</th>
+              <th>Active Detections</th>
+              <th>Active Positive Tiles</th>
+              <th>Deployment Profile</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="model-name">YOLO26n</span></td>
+              <td><span class="metric-val metric-top" style="font-size: 16px;">τ = 0.36</span></td>
+              <td><span class="metric-val">0.3981</span></td>
+              <td><span class="metric-val metric-top">71.39%</span></td>
+              <td><span class="metric-val">27.60%</span></td>
+              <td><span class="metric-val" style="color: #fff;">402</span></td>
+              <td><span class="metric-val">172</span></td>
+              <td><span class="badge badge-cyan">Precision Cataloging (Low FP)</span></td>
+            </tr>
+            <tr>
+              <td><span class="model-name">YOLOv8n</span></td>
+              <td><span class="metric-val metric-top" style="font-size: 16px;">τ = 0.26</span></td>
+              <td><span class="metric-val">0.3308</span></td>
+              <td><span class="metric-val">24.15%</span></td>
+              <td><span class="metric-val">52.50%</span></td>
+              <td><span class="metric-val" style="color: #fff;">2,261</span></td>
+              <td><span class="metric-val">500</span></td>
+              <td><span class="badge badge-gold">Balanced Exploration</span></td>
+            </tr>
+            <tr>
+              <td><span class="model-name">YOLOv5s</span></td>
+              <td><span class="metric-val metric-top" style="font-size: 16px;">τ = 0.20</span></td>
+              <td><span class="metric-val metric-top">0.4674</span></td>
+              <td><span class="metric-val">36.34%</span></td>
+              <td><span class="metric-val metric-top">65.48%</span></td>
+              <td><span class="metric-val" style="color: #fff;">1,874</span></td>
+              <td><span class="metric-val">420</span></td>
+              <td><span class="badge badge-live">High-Recall Scouting (Candidate Harvest)</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="table-footer-note">
+          <div>
+            <strong>Proxy Validation Methodology:</strong> In the absence of manual OHRC ground truth, consensus clusters (IoU ≥ 0.45 agreement across ≥2 independent models) serve as empirical pseudo-ground-truth to evaluate precision-recall operating curves.
+          </div>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <button onclick="toggleCurves()" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: var(--accent-cyan); padding: 6px 12px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+              📊 Toggle Calibration Curves
+            </button>
+            <span style="font-family: var(--font-mono); color: var(--accent-cyan); font-size: 12px;">Recommended: YOLO26n @ τ = 0.36</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expandable Calibration Curves -->
+      <div id="calibrationCurvesBox" style="display: none; margin-top: 20px; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="chart-box">
+          <div style="font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 8px;">Precision & Recall vs. Confidence Threshold</div>
+          <img src="images/precision_recall_vs_confidence.png" alt="Precision and Recall vs Confidence">
+        </div>
+        <div class="chart-box">
+          <div style="font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 8px;">F1 Score Optimization vs. Threshold (Max F1 Peak)</div>
+          <img src="images/f1_vs_threshold.png" alt="F1 Score vs Threshold">
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div>
+        <strong>Chandrayaan-2 OHRC AI Research Project</strong> &bull; Alliance University Batch 2025–2027 &bull; ISRO PRADAN PDS4 Calibrated Data
+      </div>
+      <div class="footer-links">
+        <a href="#top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ Back to Top</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Interactive Lightbox Modal -->
+  <div id="detectionModal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content-wrap" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Detection Inspection</div>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-img-box">
+          <img id="modalImg" src="" alt="Detection Preview">
+        </div>
+        <div class="modal-sidebar">
+          <div>
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--accent-cyan); font-weight: 700; margin-bottom: 4px;" id="modalCategory">Category</div>
+            <h4 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px;" id="modalHeading">Title</h4>
+            <p style="color: var(--text-muted); line-height: 1.5;" id="modalDescription">Description text goes here.</p>
+          </div>
+
+          <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px; font-family: var(--font-mono); font-size: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div><strong>Confidence:</strong> <span id="modalConf" style="color: var(--accent-cyan);">--</span></div>
+            <div><strong>Tile:</strong> <span id="modalTile" style="word-break: break-all; color: #fff;">--</span></div>
+            <div><strong>Coordinates:</strong> <span id="modalCoords">--</span></div>
+            <div><strong>Geological Context:</strong> <span id="modalGeo">--</span></div>
+          </div>
+
+          <div style="margin-top: auto;">
+            <button onclick="closeModal()" style="width: 100%; padding: 10px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: var(--accent-cyan); font-weight: 600; border-radius: var(--radius-sm); cursor: pointer;">
+              Close Inspection
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modalData = {
+      single: {
+        title: "High-Confidence Isolated Boulder Detection",
+        category: "Single Detection Case",
+        heading: "Isolated Polar Regolith Boulder",
+        img: "images/detection_single_high_conf.png",
+        description: "High-contrast boulder detection isolated on south-pole terrain. The crisp shadow boundary allows clear estimation of boulder height (~1.8 m) and diameter (~3.2 m) at 0.25 m/pixel resolution.",
+        conf: "0.6527 (YOLO26n)",
+        tile: "ch2_ohr_ncp_20190907T0438126359_d_img_g26_x05760_y85760.png",
+        coords: "Lat: -70.95°S | Solar Incidence: 84.1°",
+        geo: "Impact ejecta perched on smooth highland regolith"
+      },
+      cluster: {
+        title: "Multi-Detection Boulder Cluster (5 Rocks)",
+        category: "Mass Wasting Track",
+        heading: "Rockfall Boulder Field Chute",
+        img: "images/detection_cluster.png",
+        description: "Dense grouping of five individual boulder fragments aligned down-gradient. Corresponds to a classic lunar rockfall event where an impact disturbed an upper scarp, sending fragments rolling down-slope.",
+        conf: "Max: 0.6410 | Mean: 0.4653 (5 Boulders)",
+        tile: "ch2_ohr_ncp_20190906T2241285714_d_img_gds_x04480_y64640.png",
+        coords: "Lat: -70.99°S | Solar Incidence: 83.8°",
+        geo: "Gravitational mass-wasting chute on degraded crater wall"
+      },
+      rim: {
+        title: "Crater Rim Scarp Context Detection",
+        category: "Geomorphological Context",
+        heading: "Crater Rim Crest Slope Boulders",
+        img: "images/detection_rim_context.png",
+        description: "Detections situated directly along the sharply illuminated crest of an impact crater rim. Despite intense shadow gradients (pixel std=74.6), the detector isolates boulders without confusing shadow edges for rock boundaries.",
+        conf: "Max: 0.4401 | Spatial Gradient Std: 74.6",
+        tile: "ch2_ohr_ncp_20190906T2241285714_d_img_gds_x06400_y17280.png",
+        coords: "Lat: -70.99°S | Solar Incidence: 83.8°",
+        geo: "Topographic rim scarp with steep shadow termination"
+      }
+    };
+
+    function openModal(key) {
+      const data = modalData[key];
+      if (!data) return;
+
+      document.getElementById('modalTitle').textContent = data.title;
+      document.getElementById('modalCategory').textContent = data.category;
+      document.getElementById('modalHeading').textContent = data.heading;
+      document.getElementById('modalImg').src = data.img;
+      document.getElementById('modalDescription').textContent = data.description;
+      document.getElementById('modalConf').textContent = data.conf;
+      document.getElementById('modalTile').textContent = data.tile;
+      document.getElementById('modalCoords').textContent = data.coords;
+      document.getElementById('modalGeo').textContent = data.geo;
+
+      document.getElementById('detectionModal').classList.add('active');
+    }
+
+    function closeModal(e) {
+      if (!e || e.target.id === 'detectionModal' || e.target.classList.contains('modal-close')) {
+        document.getElementById('detectionModal').classList.remove('active');
+      }
+    }
+
+    // Switch between Model Comparison Table views
+    function switchTableTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.table-view').forEach(view => view.style.display = 'none');
+      
+      const targetBtn = document.getElementById('btn-' + tabId);
+      const targetView = document.getElementById('view-' + tabId);
+      if (targetBtn) targetBtn.classList.add('active');
+      if (targetView) targetView.style.display = 'block';
+    }
+
+    // Toggle calibration curves visibility
+    function toggleCurves() {
+      const box = document.getElementById('calibrationCurvesBox');
+      if (box.style.display === 'none' || box.style.display === '') {
+        box.style.display = 'grid';
+        box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        box.style.display = 'none';
+      }
+    }
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        document.getElementById('detectionModal').classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

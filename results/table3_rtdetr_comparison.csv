@@ -1,0 +1,5 @@
+Model,Total Detections,Positive Tiles,Evaluated Tiles,Mean Confidence
+YOLO26n,4565,1193,31769,0.297
+YOLOv5s,5026,1532,31769,0.312
+YOLOv8n,41941,6621,31769,0.313
+RT-DETR-L,436896,25483,31769,0.2959

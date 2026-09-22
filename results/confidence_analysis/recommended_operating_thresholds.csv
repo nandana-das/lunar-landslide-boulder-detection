@@ -1,0 +1,4 @@
+Model,Recommended_Threshold,Max_F1,Proxy_Precision,Proxy_Recall,Active_Detections,Active_Tiles
+YOLO26n,0.36,0.3981,0.7139,0.276,402,172
+YOLOv8n,0.26,0.3308,0.2415,0.525,2261,500
+YOLOv5s,0.2,0.4674,0.3634,0.6548,1874,420

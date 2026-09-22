@@ -27,3 +27,7 @@ YOLOv5s: mAP50=0.649, P=0.653, R=0.607
 ## Confidence Statistics (early pipeline, tau=0.20)
 YOLOv8n+HM: N=989, mean=0.273, median=0.254, <0.30=728, >=0.30=261
 YOLOv5s+HM: N=1628, mean=0.241, median=0.233, <0.30=1509, >=0.30=119
+
+
+## RT-DETR-L Results (RMaM+Prieur, Multi-HM, tau=0.20)
+RT-DETR-L: detections=436896, tiles=25483 (evaluated=31769)

@@ -80,6 +80,7 @@ session.txt
 *.tmp
 *.bak
 *.log
+*.part
 !results/preprocessing_errors.log
 tmp/
 temp/

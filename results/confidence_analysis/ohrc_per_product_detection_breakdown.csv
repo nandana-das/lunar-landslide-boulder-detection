@@ -1,0 +1,37 @@
+region,product_id,mean_latitude_deg,model,evaluated_tiles,detection_count,tiles_with_detection,mean_confidence
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20190906T2241285714_d_img_gds,-70.99,YOLO26n,129,43,26,0.3259
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20190906T2241285714_d_img_gds,-70.99,YOLOv8n,129,94,30,0.2973
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20190906T2241285714_d_img_gds,-70.99,YOLOv5s,129,17,7,0.261
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20190907T0438126359_d_img_g26,-70.95,YOLO26n,111,37,19,0.3201
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20190907T0438126359_d_img_g26,-70.95,YOLOv8n,111,12,10,0.2695
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20190907T0438126359_d_img_g26,-70.95,YOLOv5s,111,4,3,0.3137
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20240425T1012478407_d_img_d18,-69.4,YOLO26n,111,59,30,0.2914
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20240425T1012478407_d_img_d18,-69.4,YOLOv8n,111,322,45,0.3113
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20240425T1012478407_d_img_d18,-69.4,YOLOv5s,111,4,2,0.3695
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20240425T1209509264_d_img_d18,-69.43,YOLO26n,121,59,31,0.2797
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20240425T1209509264_d_img_d18,-69.43,YOLOv8n,121,268,46,0.3093
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20240425T1209509264_d_img_d18,-69.43,YOLOv5s,121,8,4,0.2706
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20240425T1406019344_d_img_d18,-69.42,YOLO26n,140,72,42,0.2906
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20240425T1406019344_d_img_d18,-69.42,YOLOv8n,140,897,77,0.3256
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20240425T1406019344_d_img_d18,-69.42,YOLOv5s,140,15,9,0.2785
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20240425T1603031918_d_img_d18,-69.41,YOLO26n,112,73,33,0.2974
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20240425T1603031918_d_img_d18,-69.41,YOLOv8n,112,332,52,0.3196
+South Pole (lat ≈ -70°S),ch2_ohr_ncp_20240425T1603031918_d_img_d18,-69.41,YOLOv5s,112,17,9,0.2979
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250516T0948068899_d_img_d18,60.46,YOLO26n,59,186,36,0.2852
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250516T0948068899_d_img_d18,60.46,YOLOv8n,59,81,27,0.3023
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250516T0948068899_d_img_d18,60.46,YOLOv5s,59,125,33,0.305
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250516T1145499313_d_img_d18,60.45,YOLO26n,70,107,33,0.2684
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250516T1145499313_d_img_d18,60.45,YOLOv8n,70,165,40,0.2782
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250516T1145499313_d_img_d18,60.45,YOLOv5s,70,113,40,0.2806
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250516T1342347288_d_img_d18,60.43,YOLO26n,66,278,50,0.2852
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250516T1342347288_d_img_d18,60.43,YOLOv8n,66,141,39,0.2895
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250516T1342347288_d_img_d18,60.43,YOLOv5s,66,201,40,0.2973
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250516T1540191774_d_img_d18,60.47,YOLO26n,90,177,57,0.278
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250516T1540191774_d_img_d18,60.47,YOLOv8n,90,515,71,0.3023
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250516T1540191774_d_img_d18,60.47,YOLOv5s,90,277,61,0.3145
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250612T2031048828_d_img_d18,60.59,YOLO26n,188,697,99,0.3118
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250612T2031048828_d_img_d18,60.59,YOLOv8n,188,503,109,0.3112
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250612T2031048828_d_img_d18,60.59,YOLOv5s,188,536,107,0.321
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250612T2229094979_d_img_d18,60.62,YOLO26n,217,265,68,0.2996
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250612T2229094979_d_img_d18,60.62,YOLOv8n,217,516,106,0.3305
+Equatorial (lat ≈ +60°N),ch2_ohr_ncp_20250612T2229094979_d_img_d18,60.62,YOLOv5s,217,557,105,0.3332

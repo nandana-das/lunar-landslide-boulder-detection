@@ -58,6 +58,7 @@ Stage 3: OHRC Inference
 | **YOLO26n** | **Stage 2 + Multi-HM** | **0.640** | **0.660** | 0.590 |
 | YOLOv8n | Stage 2 + Multi-HM | 0.596 | 0.620 | 0.568 |
 | YOLOv5s | Stage 2 + Multi-HM | 0.649 | 0.653 | **0.607** |
+| RT-DETR-L | Stage 2 + Multi-HM | 0.484 | 0.548 | 0.537 |
 
 ### OHRC Target Domain Inference (31,769 tiles, τ=0.20)
 
@@ -69,24 +70,21 @@ Stage 3: OHRC Inference
 | **YOLO26n** | **RMaM+Prieur, Multi-HM** | **4,565** | **1,193** |
 | YOLOv5s | RMaM+Prieur, Multi-HM | 5,026 | 1,532 |
 | YOLOv8n† | RMaM+Prieur, Multi-HM | 3,118† | 1,257† |
+| RT-DETR-L‡ | RMaM+Prieur, Multi-HM | 436,896‡ | 25,483‡ |
 
-†YOLOv8n over-detects at τ=0.20 (41,941 detections); τ=0.50 used here.
+†YOLOv8n over-detects at τ=0.20 (41,941 detections); τ=0.50 used here.  
+‡RT-DETR-L exhibits vision transformer texture hallucination on unannotated target domain (80.2% tile hit rate).
 
 ---
 
-## Dataset
+## Interactive Presentation Demo
 
-### Source Domain (Labeled)
-| Dataset | Source | Images | Format |
-|---------|--------|--------|--------|
-| RMaM-2020 (lunar only) | [EDMOND](https://edmond.mpdl.mpg.de) | 349 train, 17 test | CSV bbox → YOLO |
-| Prieur et al. 2023 (lunar only) | [Zenodo 14250874](https://zenodo.org/records/14250874) | 3,719 train, 697 val, 262 test | Polygon → YOLO bbox |
-
-### Target Domain (Unlabeled)
-- **Chandrayaan-2 OHRC calibrated products** from [ISSDC PRADAN](https://pradan.issdc.gov.in)
-- 12 products (rows 600–624 of OHRC catalog)
-- 6 south pole products (lat ≈ −70°S, SI 78°–84°) + 6 equatorial (lat ≈ +60°N, SI 59°–68°)
-- 31,769 usable 640×640 PNG tiles after dark tile filtering (mean pixel < 20)
+Open `demo/index.html` directly in any web browser to view the self-contained presentation demo, including:
+- 5-stage pipeline interactive flowchart
+- Full 4-model architecture comparison (CNN vs. Vision Transformer)
+- Sample annotated detection gallery with high-resolution modal inspection
+- Regional divergence analysis (South Pole vs. Equatorial)
+- Recommended operating threshold calibration curves
 
 ---
 
@@ -94,13 +92,21 @@ Stage 3: OHRC Inference
 
 ```
 lunar-landslide-boulder-detection/
+├── demo/
+│   ├── index.html                  # Self-contained presentation demo
+│   └── images/                     # Annotated detection tiles & calibration plots
 ├── scripts/
+│   ├── train_rtdetr_pipeline.py    # RT-DETR Stage 1 & 2 training & eval
+│   ├── analyze_regional_detections.py # Regional breakdown & comparison plot
+│   ├── generate_ohrc_confidence_curves.py # Precision-recall & F1 threshold curves
+│   ├── evaluate_test_split.py      # Held-out lunar test split evaluation
 │   ├── convert_rmam_labels.py      # RMaM CSV → YOLO bbox format
 │   ├── convert_prieur_labels.py    # Prieur polygon → YOLO bbox
 │   ├── filter_moon_only.py         # Filter Moon subset from Prieur
 │   ├── combine_datasets.py         # Merge RMaM + Prieur → combined/
 │   ├── histogram_matching.py       # Multi-reference HM (RMaM images)
 │   ├── hm_val.py                   # Apply HM to Prieur val set
+│   ├── hm_test.py                  # Apply HM to Prieur test set
 │   ├── combined_hm_prep.py         # HM Prieur train + merge with RMaM HM
 │   ├── tile_ohrc.py                # PDS4 → GeoTIFF → 640×640 tiles
 │   ├── inspect_pds4.py             # PDS4 metadata reader
@@ -116,7 +122,12 @@ lunar-landslide-boulder-detection/
 │   ├── dataset_hm.yaml             # Single-ref HM config
 │   └── dataset_hm_multi.yaml       # Multi-ref HM config
 ├── results/
-│   ├── inference_results_summary.txt  # All detection counts + mAP results
+│   ├── table2_rtdetr_comparison.csv # 4-model validation benchmark
+│   ├── table3_rtdetr_comparison.csv # 4-model OHRC inference comparison
+│   ├── test_metrics_stage2.csv     # Test split quantitative metrics
+│   ├── confidence_analysis/        # PR/F1 curves, regional plots & threshold tables
+│   ├── ohrc_inference/             # Raw detection CSVs per model
+│   ├── inference_results_summary.txt # All detection counts + mAP results
 │   ├── dataset_manifest.csv
 │   ├── tile_statistics.csv
 │   └── ohrc_dataset_metadata.csv
