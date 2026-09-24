@@ -26,8 +26,13 @@ data/raw/
 
 # ── Results / generated CSVs and logs (optional: commit summary CSVs) ──
 results/quality_control/
+results/ajax_view_*.xml
+results/live_browse_page.html
+scripts/test_*.py
+scripts/pradan_bulk_download.py
 # Uncomment below if you want to exclude all results:
 # results/
+
 
 # ── Python ────────────────────────────────────────────────────
 __pycache__/
