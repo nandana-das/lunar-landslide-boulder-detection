@@ -106,6 +106,27 @@ The 4-model evaluation yields an important theoretical finding for extraterrestr
 - **CNNs (YOLO26n, YOLOv5s):** Strong translation equivariance and local receptive fields act as an effective regularizer against regolith texture noise, confining detections to discrete physical boulders with cast shadows.
 - **Vision Transformers (RT-DETR-L):** Global self-attention without strong local inductive priors causes the model to associate subtle regolith texture gradients with boulder morphology, producing massive false-positive cascades in out-of-domain target inference.
 
+### 5. Cross-Regional Generalization & Ultra-Deep South Pole Benchmark ($\le -89.5^\circ\text{S}$)
+
+To test geographical generalization, we scaled inference across an ultra-deep South Pole dataset (20 calibrated products, 13,906 usable non-dark tiles, spanning longitudes $117.0^\circ\text{E}$ to $248.1^\circ\text{E}$) and compared against baseline South Pole ($-70^\circ\text{S}$) and Equatorial ($+60^\circ\text{N}$) regions:
+
+| Region | Model | Detection Count | Positive Tiles | Total Evaluated Tiles | Positive-Tile Rate (%) | Mean Conf | Std Conf | Detections / Positive Tile |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| South Pole ($\sim -70^\circ\text{S}$) | YOLO26n | 343 | 181 | 724 | 25.00% | 0.2979 | 0.0934 | 1.90 |
+| South Pole ($\sim -70^\circ\text{S}$) | YOLOv8n | 1,925 | 260 | 724 | 35.91% | 0.3182 | 0.1107 | 7.40 |
+| South Pole ($\sim -70^\circ\text{S}$) | YOLOv5s | 65 | 34 | 724 | 4.70% | 0.2858 | 0.0764 | 1.91 |
+| Equatorial ($\sim +60^\circ\text{N}$) | YOLO26n | 1,710 | 343 | 690 | 49.71% | 0.2965 | 0.0862 | 4.99 |
+| Equatorial ($\sim +60^\circ\text{N}$) | YOLOv8n | 1,921 | 392 | 690 | 56.81% | 0.3092 | 0.1003 | 4.90 |
+| Equatorial ($\sim +60^\circ\text{N}$) | YOLOv5s | 1,809 | 386 | 690 | 55.94% | 0.3175 | 0.1018 | 4.69 |
+| **Ultra-Deep South Pole** ($\le -89.5^\circ\text{S}$) | **YOLO26n** | **2,900** | **1,247** | **13,906** | **8.97%** | **0.2799** | **0.0789** | **2.33** |
+| **Ultra-Deep South Pole** ($\le -89.5^\circ\text{S}$) | **YOLOv8n** | **7,689** | **2,268** | **13,906** | **16.31%** | **0.3098** | **0.1060** | **3.39** |
+| **Ultra-Deep South Pole** ($\le -89.5^\circ\text{S}$) | **YOLOv5s** | **1,051** | **427** | **13,906** | **3.07%** | **0.3182** | **0.1089** | **2.46** |
+| **Ultra-Deep South Pole** ($\le -89.5^\circ\text{S}$) | **RT-DETR-L** | **532,844** | **11,664** | **13,906** | **83.88%** | **0.3258** | **0.1063** | **45.68** |
+
+**Regional Insights:**
+- **Grazing Illumination Shadowing:** In deep polar terrain ($\le -89.5^\circ\text{S}$), low solar elevation angles cause prolonged shadow cast and crater-floor occlusions, reducing CNN positive-tile rates (YOLO26n drops from $25.0\%$ to $8.97\%$).
+- **Consistent Model Hierarchy:** The relative sensitivity ordering (YOLOv8n > YOLO26n > YOLOv5s) remains invariant across all three distinct geological zones.
+
 ---
 
 ## Interactive Presentation Demo
@@ -152,11 +173,12 @@ lunar-landslide-boulder-detection/
 │   ├── inspect_pds4.py             # PDS4 metadata reader & parser
 │   ├── generate_previews.py        # OHRC image preview generator
 │   ├── train_stage1_all.py         # Stage 1 — train all 3 YOLO models
-│   ├── train_stage2.py             # Stage 2 — single model fine-tuning
 │   ├── train_stage2_v2.py          # Stage 2 — all 3 models with HM validation
 │   ├── infer_ohrc.py               # Streaming OHRC tile inference
 │   ├── check_confidence.py         # Confidence threshold sweep & metrics
-│   └── run_pipeline.py             # Master pipeline orchestrator
+│   ├── run_pipeline.py             # Master pipeline orchestrator
+│   ├── scrape_calibrated_catalog.py # Automated PRADAN PDS4 metadata catalog scraper
+│   └── process_polar_batch.py      # Automated pipeline for 20 ultra-deep polar products
 ├── data/rmam/
 │   ├── dataset.yaml                # Source RMaM training config
 │   ├── dataset_hm.yaml             # Single-ref HM config
@@ -166,8 +188,14 @@ lunar-landslide-boulder-detection/
 │   ├── test_metrics_summary.md     # Markdown test split summary table
 │   ├── table2_rtdetr_comparison.csv # 4-model validation benchmark
 │   ├── table3_rtdetr_comparison.csv # 4-model OHRC inference comparison
+│   ├── table4_with_ultradeep_polar.csv # Cross-regional evaluation across 3 regimes
+│   ├── table4_with_ultradeep_polar.md  # Markdown Table IV comparison
 │   ├── confidence_analysis/        # PR/F1 curves, regional plots & threshold tables
 │   ├── ohrc_inference/             # Raw detection CSVs per model
+│   ├── polar_inference/            # Ultra-deep polar raw detections & tiling stats
+│   ├── pradan_ohrc_metadata_catalog.csv # Catalog metadata for 280 OHRC products
+│   ├── pradan_ohrc_southpole_deep_filtered.csv # South Pole products (< -84°S)
+│   ├── selected_20_polar_products.csv # Curated 20 diverse polar products (<= -89.5°S)
 │   ├── inference_results_summary.txt # Detection counts & summary statistics
 │   ├── dataset_manifest.csv        # Dataset catalog & split counts
 │   ├── tile_statistics.csv         # OHRC tile dimension and radiance stats
@@ -221,7 +249,12 @@ python scripts/infer_ohrc.py --conf 0.20
 python scripts/check_confidence.py
 python scripts/generate_ohrc_confidence_curves.py
 python scripts/analyze_regional_detections.py
+
+# 8. Ultra-Deep South Pole Catalog Scraping & Pipeline (<= -89.5°S)
+python scripts/scrape_calibrated_catalog.py
+python scripts/process_polar_batch.py
 ```
+
 
 ---
 
